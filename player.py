@@ -1,12 +1,15 @@
 import asyncio
 import json
 import ssl
+import time
 import os
 import argparse
 import pickle
 import logging
 from typing import Deque, Dict, List, Optional, Union, cast
 from urllib.parse import urlparse
+
+from pprint import pformat
 
 try:
     import uvloop
@@ -33,7 +36,18 @@ async def initiate_player_event(configuration: QuicConfiguration, args) -> None:
 
     dc = DashClient(configuration, args)
 
-    await dc.play()
+    start = time.time()
+    await dc.player()
+    elapsed = time.time() - start
+    
+    dc.perf_parameters['total_time_played'] = elapsed
+    dc.perf_parameters['startup_delay'] = dc.perf_parameters['startup_delay'] - start
+
+    dc.perf_parameters['MPC_QOE'] = dc.perf_parameters['avg_bitrate'] - (config.LAMBDA * dc.perf_parameters['avg_bitrate_change']) \
+									- (config.MU * dc.perf_parameters['rebuffer_time']) - (config.MU * dc.perf_parameters['startup_delay'])
+
+    logger.info("Playback completed")
+    logger.info(pformat(dc.perf_parameters))
 
 
 
