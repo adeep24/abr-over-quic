@@ -14,7 +14,12 @@ from clients.quic_client import QuicClient
 from clients.h3_client import HttpClient, perform_http_request
 
 
-logger = logging.getLogger("Builder")
+
+# logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+#     datefmt='%Y-%m-%d:%H:%M:%S')
+    # level=logging.DEBUG)
+import logger
+logger = logger.logger('Builder')
 
 def save_session_ticket(ticket: SessionTicket) -> None:
     """

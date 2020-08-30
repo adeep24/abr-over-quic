@@ -27,8 +27,9 @@ import config
 from adaptive.mpc import MPC
 from clients.build import run
 
-logger = logging.getLogger("DASH Player")
-
+import logger
+# logger = logging.getLogger("DASH Player")
+logger = logger.logger("DASH Player")
 
 
 async def initiate_player_event(configuration: QuicConfiguration, args) -> None:

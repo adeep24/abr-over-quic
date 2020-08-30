@@ -49,7 +49,7 @@ python3 player.py https://localhost:4433/10 --ca-certs tests/pycacert.pem --outp
 
 - QUIC only support client
 ```
-python3 player.py https://localhost:4433/ --ca-certs tests/pycacert.pem --output-dir=. --include --legacy-quic -v
+python3 player.py --urls https://localhost:4433/ --ca-certs tests/pycacert.pem --output-dir=. --include --legacy-quic -v
 ```
 
 **Server**

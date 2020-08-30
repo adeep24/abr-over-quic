@@ -46,12 +46,12 @@ class HttpRequestHandler:
         scope: Dict,
         stream_ended: bool,
         stream_id: int,
-        transmit: Callable[[], None],
-    ) -> None:
+        transmit: Callable[[], None]
+        ) -> None:
         self.authority = authority
         self.connection = connection
         self.protocol = protocol
-        self.queue: asyncio.Queue[Dict] = asyncio.Queue()
+        self.queue= asyncio.Queue[Dict] = asyncio.Queue()
         self.scope = scope
         self.stream_id = stream_id
         self.transmit = transmit
@@ -126,9 +126,9 @@ class HttpRequestHandler:
 class HttpServerProtocol(QuicFactorySocket):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self._handlers: Dict[int, HttpRequestHandler] = {}
-        self._http: Optional[HttpConnection] = None
-        self.quic_client: bool = False
+        self._handlers : Dict[int, HttpRequestHandler] = {}
+        self._http : Optional[HttpConnection] = None
+        self.quic_client : bool = False
 
     def http_event_received(self, event: H3Event) -> None:
         if isinstance(event, HeadersReceived) and event.stream_id not in self._handlers:
@@ -253,6 +253,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--host",
         type=str,
+        # default="130.245.144.152",
         default="::",
         help="listen on the specified address (defaults to ::)",
     )

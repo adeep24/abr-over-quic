@@ -3,7 +3,7 @@ URLS = ['https://localhost:4433/']
 
 NUM_SERVER_PUSHED_FRAMES = 10
 
-MANIFEST_FILE = "/home/aniketh/devel/src/abr-over-quic/htdocs/bbb_m.json"
+MANIFEST_FILE = "./htdocs/video_properties.json"
 CA_CERTS = "tests/pycacert.pem"
 
 OUT_DIR = ".cache/"

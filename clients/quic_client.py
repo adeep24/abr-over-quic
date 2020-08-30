@@ -12,7 +12,8 @@ from aioquic.quic.events import QuicEvent, DatagramFrameReceived, StreamDataRece
 from protocol.client import connect
 from protocol.socketFactory import QuicFactorySocket
 
-logger = logging.getLogger("quic client")
+import logger
+logger = logger.logger("quic client")
 
 
 class QuicClient(QuicFactorySocket):
