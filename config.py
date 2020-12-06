@@ -1,5 +1,6 @@
 # Can provide a list of manifest to download via HTTP/3
-URLS = ['https://localhost:4433/']
+# URLS = ['https://localhost:4433/']
+URLS = ['https://localhost:4433/video1/video_properties.json']
 
 NUM_SERVER_PUSHED_FRAMES = 10
 

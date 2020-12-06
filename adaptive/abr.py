@@ -1,4 +1,4 @@
-# super class for adaptive alogorithms
+# super class for adaptive algorithms
 # This class implements basic throughput rule
 
 
@@ -19,9 +19,10 @@ class BasicABR:
     on the basis of the throughput rule.
     '''
     def NextSegmentQualityIndex(self, playerStats):
-        tput = playerStats["lastTput"]
+        tput = playerStats["lastTput_kbps"]
         #p = manifest.segment_time
-        m_bitrate = self.manifestData.get('bitrates_kbps')
+        # m_bitrate = self.manifestData.get('bitrates_kbps')
+        m_bitrate = self.manifestData.get('bitrates')
         if not tput:
             return 0
 

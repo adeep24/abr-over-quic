@@ -35,6 +35,10 @@ HttpConnection = Union[H0Connection, H3Connection]
 
 SERVER_NAME = "aioquic/" + aioquic.__version__
 
+import logger
+
+logger = logger.logger('sky_server')
+totalQuicEvents = 0
 
 class HttpRequestHandler:
     def __init__(
@@ -51,7 +55,7 @@ class HttpRequestHandler:
         self.authority = authority
         self.connection = connection
         self.protocol = protocol
-        self.queue= asyncio.Queue[Dict] = asyncio.Queue()
+        self.queue: asyncio.Queue[Dict] = asyncio.Queue()
         self.scope = scope
         self.stream_id = stream_id
         self.transmit = transmit
@@ -80,6 +84,8 @@ class HttpRequestHandler:
         return await self.queue.get()
 
     async def send(self, message: Dict) -> None:
+
+        logger.debug('got send request: with stream id>{}:for messagetype:{}'.format(self.stream_id, message['type']))
         if message["type"] == "http.response.start":
             self.connection.send_headers(
                 stream_id=self.stream_id,
@@ -157,13 +163,16 @@ class HttpServerProtocol(QuicFactorySocket):
                 path_bytes, query_string = raw_path, b""
             path = path_bytes.decode()
             self._quic._logger.info("HTTP request %s %s", method, path)
-
+            logger.debug("HTTP request:{}, {}".format(method, path) )
+            
+            
             # FIXME: add a public API to retrieve peer address
             client_addr = self._http._quic._network_paths[0].addr
             client = (client_addr[0], client_addr[1])
 
             extensions: Dict[str, Dict] = {}
             if isinstance(self._http, H3Connection):
+                logger.info('345678765456765424234792346723640328577`2-3460324345678765456765424234792346723640328577`2-3460324')
                 extensions["http.response.push"] = {}
                 scope = {
                     "client": client,
@@ -187,8 +196,10 @@ class HttpServerProtocol(QuicFactorySocket):
                     stream_id=event.stream_id,
                     transmit=self.transmit,
                 )
+                logger.info('stream id hai:{}'.format(event.stream_id))
             self._handlers[event.stream_id] = handler
             asyncio.ensure_future(handler.run_asgi(application))
+
         elif (
             isinstance(event, (DataReceived, HeadersReceived))
             and event.stream_id in self._handlers
@@ -197,6 +208,9 @@ class HttpServerProtocol(QuicFactorySocket):
             handler.http_event_received(event)
 
     def quic_event_received(self, event: QuicEvent) -> None:
+        global totalQuicEvents
+        totalQuicEvents += 1
+        # logger.info('quic event recieved:{}'.format(totalQuicEvents))
         if isinstance(event, ProtocolNegotiated):
             if event.alpn_protocol.startswith("h3-"):
                 self._http = H3Connection(self._quic)
@@ -211,6 +225,7 @@ class HttpServerProtocol(QuicFactorySocket):
                 self._quic.send_datagram_frame(b'quic-ack')
 
         if isinstance(event, StreamDataReceived):
+            # logger.info('aakash kuch to aaya')
             if self.quic_client is True:
                 print(f"print event {event.data}")
                 data = b'quic stream-data recv'
@@ -223,6 +238,7 @@ class HttpServerProtocol(QuicFactorySocket):
         #  pass event to the HTTP layer
         if self._http is not None:
             for http_event in self._http.handle_event(event):
+                logger.debug('http event recieved')
                 self.http_event_received(http_event)
 
 
@@ -331,6 +347,7 @@ if __name__ == "__main__":
 
     ticket_store = SessionTicketStore()
 
+    logger.info('here')
     if uvloop is not None:
         uvloop.install()
     loop = asyncio.get_event_loop()
@@ -345,6 +362,7 @@ if __name__ == "__main__":
             retry=args.retry,
         )
     )
+    logger.info('ab yahan')
     try:
         loop.run_forever()
     except KeyboardInterrupt:

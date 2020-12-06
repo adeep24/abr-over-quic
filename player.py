@@ -56,7 +56,9 @@ if __name__ == "__main__":
     defaults = QuicConfiguration(is_client=True)
     parser = argparse.ArgumentParser(description="The player, A streaming client supporting multiple ABR options and both QUIC and HTTP/3 support")
     parser.add_argument(
-        "--urls", type=str, nargs="+", help="the URL to query (must be HTTPS)"
+        "--urls", type=str,
+        default=config.URLS, 
+        nargs="+", help="the URL to query (must be HTTPS)"
     )
     parser.add_argument(
         "--manifest-file", type=str, help="Path to the custom manifest file"

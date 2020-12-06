@@ -30,7 +30,9 @@ try:
 except ImportError:
     uvloop = None
 
-logger = logging.getLogger("h3 client")
+import logger
+logger = logger.logger("h3 client")
+# logger = logging.getLogger("h3 client")
 
 HttpConnection = Union[H0Connection, H3Connection]
 
@@ -140,6 +142,7 @@ async def perform_http_request(
 ) -> None:
     # perform request
     start = time.time()
+    logger.info('here 2')
     if data is not None:
         http_events = await client.post(
             url,
@@ -150,32 +153,47 @@ async def perform_http_request(
         http_events = await client.get(url)
     elapsed = time.time() - start
 
+    logger.info('here 3')
     # print speed
     octets = 0
     for http_event in http_events:
         if isinstance(http_event, DataReceived):
             octets += len(http_event.data)
     logger.info(
-        "Received %d bytes in %.1f s (%.3f Mbps)"
+        "Received %d bytes in %.3f s (%.3f Mbps)"
         % (octets, elapsed, octets * 8 / elapsed / 1000000)
     )
 
     tput = octets * 8 / elapsed / 1000000
 
-    # output response
-    if output_dir is not None:
-        output_path = os.path.join(
-            output_dir, os.path.basename(urlparse(url).path) or "index.html"
-        )
-        with open(output_path, "wb") as output_file:
-            for http_event in http_events:
-                if isinstance(http_event, HeadersReceived) and include:
-                    headers = b""
-                    for k, v in http_event.headers:
-                        headers += k + b": " + v + b"\r\n"
-                    if headers:
-                        output_file.write(headers + b"\r\n")
-                elif isinstance(http_event, DataReceived):
-                    output_file.write(http_event.data)
+    # stiching downloaded data
+    downloaded_data = b''
+    for http_event in http_events:
+        if isinstance(http_event, DataReceived):
+            downloaded_data += http_event.data
+    
+    # downloaded_data = ''.join(downloaded_data)
+    # logger.info(downloaded_data)
 
-    return octets, tput, elapsed
+
+
+    # output response
+    # if output_dir is not None:
+    #     output_path = os.path.join(
+    #         output_dir, os.path.basename(urlparse(url).path) or "index.html"
+    #     )
+    #     with open(output_path, "wb") as output_file:
+    #         for http_event in http_events:
+    #             # if isinstance(http_event, HeadersReceived) and include:
+    #             #     headers = b""
+    #             #     for k, v in http_event.headers:
+    #             #         headers += k + b": " + v + b"\r\n"
+    #             #     if headers:
+    #             #         output_file.write(headers + b"\r\n")
+    #             # elif isinstance(http_event, DataReceived):
+    #             #     output_file.write(http_event.data)
+    #             if isinstance(http_event, DataReceived):
+    #                 logger.info(http_event.data)
+    #                 output_file.write(http_event.data)
+
+    return (octets, tput, elapsed, downloaded_data)

@@ -6,7 +6,7 @@ class logger(logging.Logger):
         
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('[%(asctime)s] p%(process)s <%(filename)s:%(lineno)d> %(levelname)s - %(message)s','%m-%d %H:%M:%S')
+        formatter = logging.Formatter('[%(asctime)s] p%(process)s <%(filename)s:%(lineno)d> %(name)s %(levelname)s - %(message)s','%m-%d %H:%M:%S')
 
         ch.setFormatter(formatter)
         self.addHandler(ch)

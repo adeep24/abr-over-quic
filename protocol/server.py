@@ -16,7 +16,9 @@ from aioquic.quic.packet import (
     encode_quic_retry,
     encode_quic_version_negotiation,
 )
-
+totalDatagrams = 0
+import logger
+logger = logger.logger('custom protocol')
 class QuicServer(asyncio.DatagramProtocol):
     def __init__(
         self,
@@ -43,14 +45,22 @@ class QuicServer(asyncio.DatagramProtocol):
         else:
             self._retry = None
 
+        # logger.info('quic server created')
+
+
+
 
     def connection_made(self, transport: asyncio.BaseTransport) -> None:
         self._transport = cast(asyncio.DatagramProtocol, transport)
+        # logger.info('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++somebody made connection')
 
     def datagram_received(self, data: Union[bytes, Text], addr: NetworkAddress) -> None:
         data = cast(bytes, data)
         buf = Buffer(data=data)
-
+        # logger.info("datagram received")
+        global totalDatagrams
+        totalDatagrams += 1
+        # logger.info('total:{} {}'.format(totalDatagrams, addr))
         try:
             header = pull_quic_header(
                 buf, host_cid_length=self._configuration.connection_id_length
@@ -176,7 +186,7 @@ async def start_server(
     stream_handler: QuicStreamHandler = None,
 ) -> QuicServer:
     loop = asyncio.get_event_loop()
-
+    logger.info('hello got here')
     _, protocol = await loop.create_datagram_endpoint(
         lambda: QuicServer(
             configuration= configuration,
@@ -188,5 +198,6 @@ async def start_server(
         ),
         local_addr=(host, port),
     )
+    logger.info('returing server with protocol')
     return cast(QuicServer, protocol)
 

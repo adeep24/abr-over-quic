@@ -44,7 +44,10 @@ $ python3 setup.py install --user
 
 - H3 only support client
 ```
-python3 player.py https://localhost:4433/10 --ca-certs tests/pycacert.pem --output-dir=. --include -v
+python3 player.py --urls https://localhost:4433/10 --ca-certs tests/pycacert.pem --output-dir=. --include -v
+```
+```
+python3 player.py --ca-certs tests/pycacert.pem --output-dir=. --include -v
 ```
 
 - QUIC only support client

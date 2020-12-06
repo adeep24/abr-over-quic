@@ -65,7 +65,7 @@ async def run(
             client = cast(QuicClient, client)
             logger.info("sending quic ack")
             await client.quic_datagram_send()
-            logger.info("recieved quic ack")
+            logger.info("received quic ack")
             logger.info("sending quic data in stream")
             for i in range(5):
                 await client.quic_stream_send()
@@ -81,9 +81,11 @@ async def run(
             wait_connected=not zero_rtt,
         ) as client:
             client = cast(HttpClient, client)
-
+            logger.info('Got till here')
+            logger.info(urls)
+            
             coros = [
-                perform_http_request(
+                 perform_http_request(
                     client=client,
                     url=url,
                     data=data,
