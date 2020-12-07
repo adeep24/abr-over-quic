@@ -112,8 +112,12 @@ venv.bak/
 
 #Don't push in htdocs as it has the larger
 #files like video file and segments
-htdocs/
-
+htdocs/all/frames
+htdocs/all/icodes
+htdocs/all/pcodes
+htdocs/templates
+htdocs/video1
+htdocs/bbb_m.json
 # Spyder project settings
 .spyderproject
 .spyproject
