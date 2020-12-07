@@ -142,7 +142,6 @@ async def perform_http_request(
 ) -> None:
     # perform request
     start = time.time()
-    logger.info('here 2')
     if data is not None:
         http_events = await client.post(
             url,
@@ -153,7 +152,7 @@ async def perform_http_request(
         http_events = await client.get(url)
     elapsed = time.time() - start
 
-    logger.info('here 3')
+    # logger.info('here 3')
     # print speed
     octets = 0
     for http_event in http_events:

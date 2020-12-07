@@ -35,62 +35,43 @@ or, again within the submodule:
 ```
 $ python3 setup.py install --user
 ```
+or, do it manually if using conda environment
 
+Httpbin
+```
+conda install -c dmnapolitano httpbin
+```
+
+Asgiref
+```
+conda install -c conda-forge asgiref
+```
+
+Starlette
+```
+conda install -c conda-forge starlette
+```
+
+Aiofiles
+```
+conda install -c anaconda aiofiles
+```
+
+Requires python 3.6+
+
+Change different settings such as video URL and server IP address in config.py file
 
 
 ### Usage:
 
 **Client**
 
-- H3 only support client
-```
-python3 player.py --urls https://localhost:4433/10 --ca-certs tests/pycacert.pem --output-dir=. --include -v
-```
 ```
 python3 player.py --ca-certs tests/pycacert.pem --output-dir=. --include -v
-```
-
-- QUIC only support client
-```
-python3 player.py --urls https://localhost:4433/ --ca-certs tests/pycacert.pem --output-dir=. --include --legacy-quic -v
 ```
 
 **Server**
 
 ```
 $ python3 server.py -c tests/ssl_cert.pem -k tests/ssl_key.pem -v
-```
-
-**Move frames**
-
-```
-$ python3 move_frames.py --input ../scripts/abr/dash --output htdocs/out --action=mv_manifest
-```
-
-**How to execute the `decode_frame.c` file inside `abr-over-quic/scripts/abr`?**
-
-```
-~$ cc decode_frames.c -lstdc++ -lavcodec -lavformat -lavutil -lswresample -lswscale -o decode
-```
-
-#### Using manifest.py script for various functions
-
-*In the order of how the execution should be done.*
-
-**Re-encode the given input to various resolutions bitrates**
-
-```
-$ python3 manifest.py --input Big_Buck_Bunny_1080_10s_20MB.mp4 --action=encode
-```
-
-**Create segments for all the re-encoded video files**
-
-```
-$ python3 manifest.py --input Big_Buck_Bunny_1080_10s_20MB.mp4 --action=segmentation
-```
-
-**Create a custom manifest file for the tests**
-
-```
-$ python3 manifest.py --input Big_Buck_Bunny_1080_10s_20MB.mp4 --action=mpd --seg_duration=1
 ```

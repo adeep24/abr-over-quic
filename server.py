@@ -11,7 +11,7 @@ from email.utils import formatdate
 from typing import Callable, Dict, Optional, Union, cast
 
 from quic_logger import QuicDirectoryLogger
-
+import config
 import aioquic
 from aioquic.tls import SessionTicket
 from aioquic.quic.configuration import QuicConfiguration
@@ -269,8 +269,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--host",
         type=str,
-        # default="130.245.144.152",
-        default="::",
+        default=config.IPaddr,
+        # default="::",
         help="listen on the specified address (defaults to ::)",
     )
     parser.add_argument(
@@ -346,8 +346,6 @@ if __name__ == "__main__":
     configuration.load_cert_chain(args.certificate, args.private_key)
 
     ticket_store = SessionTicketStore()
-
-    logger.info('here')
     if uvloop is not None:
         uvloop.install()
     loop = asyncio.get_event_loop()
@@ -362,7 +360,7 @@ if __name__ == "__main__":
             retry=args.retry,
         )
     )
-    logger.info('ab yahan')
+    
     try:
         loop.run_forever()
     except KeyboardInterrupt:

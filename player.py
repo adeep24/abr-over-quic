@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
     if args.manifest_file is None:
         args.manifest_file = config.MANIFEST_FILE
-    manifest = json.load(open(args.manifest_file))
+    # manifest = json.load(open(args.manifest_file))
 
     configuration = QuicConfiguration(
         is_client=True,

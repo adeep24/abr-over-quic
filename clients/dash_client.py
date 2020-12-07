@@ -41,7 +41,7 @@ async def perform_download(configuration: QuicConfiguration, args, urlsToDwnld =
 	if args.urls is None:
 		args.urls = config.URLS
 	if urlsToDwnld:
-		logger.debug('downloading segment urls :{}'.format(urlsToDwnld))
+		# logger.debug('downloading segment urls :{}'.format(urlsToDwnld))
 		res = await run(
 				configuration=configuration,
 				# urls=args.urls,
@@ -55,7 +55,7 @@ async def perform_download(configuration: QuicConfiguration, args, urlsToDwnld =
 				session_ticket=args.session_ticket,
 			)
 	else:
-		logger.debug('downloading manifest urls:{}'.format(args.urls))
+		# logger.debug('downloading manifest urls:{}'.format(args.urls))
 		res = await run(
 				configuration=configuration,
 				urls=args.urls,
@@ -157,9 +157,38 @@ class DashClient:
 	def latest_segment_Throughput_kbps(self):
 		# returns throughput value of last segment downloaded in kbps
 		return self.latest_tput
+
+
+	def genUrlsForSegment(self, segmentNum, bitrateIdx):
+		iCodeFrequency = self.manifest_data['iFrameFrequency']
+
+		def isIcodeFrame(frameNum):
+			# print(frameNum)
+			if (frameNum - 1) % iCodeFrequency == 0:
+				return True
+			return False
+
+		totalFrames = self.manifest_data['framePerSegment']
+		urlsToDwnld = []
+		iFrameName = self.manifest_data['iFrame']
+		pFrameName = self.manifest_data['pFrame']
+
+		temp = ''
+		for frameNum in range(1, totalFrames+1):
+			if isIcodeFrame(frameNum):
+				temp = iFrameName
+			else:
+				temp = pFrameName.replace('$trackNum$', str(bitrateIdx).zfill(4))
+
+			temp = temp.replace("$segNum$", str(segmentNum).zfill(4)) \
+				.replace("$frameNum$", str(frameNum).zfill(4))
 	
+			urlsToDwnld.append(self.baseUrl+ '/frames/' + temp)
+		return urlsToDwnld
+
+
 	# async def fetchNextSegment(self, segment_list, bitrate = 0):
-	async def fetchNextSegment(self, segmentNum, bitrate = 0):
+	async def fetchNextSegment(self, segmentNum = 1, bitrate = 0):
 		# if not bitrate:
 		# 	return
 
@@ -178,20 +207,21 @@ class DashClient:
 		# 	start = time.time()
 		# 	res = await perform_download(self.configuration, self.args)
 		# 	elapsed = time.time() - start
-
-
 		
 		# _, self.segment_baseName = fname.rsplit('/', 1)
 		# self.args.urls[0] = self.baseUrl + '/' + str(os.stat(fname).st_size)
 
 		urlsToDwnld:List[str] = []
-
+		
+		
 		for i in range(3):
 			t_str = self.baseUrl + '/video_' + str(bitIdx) + '_dash' + str(segmentNum+i)
 			urlsToDwnld.append(t_str)
+		
+		urlsToDwnld = self.genUrlsForSegment(segmentNum, bitIdx+1)
 
 		# self.args.urls[0] = self.baseUrl + '/video_' + str(bitIdx) + '_dash' + str(segmentNum) 
-		logger.info('aakash :{}'.format(urlsToDwnld))
+		# logger.info('aakash :{}'.format(urlsToDwnld))
 		start = time.time()
 		# res = await perform_download(self.configuration, self.args)
 		res = await perform_download(self.configuration, self.args, urlsToDwnld)
@@ -203,7 +233,8 @@ class DashClient:
 			self.lastDownloadTime = elapsed
 			self.lastDownloadSize = data
 			self.latest_tput =  res[0][1]
-
+			
+			# TODO: put data in queue instead of urls
 			await self.segmentQueue.put(urlsToDwnld)
 
 			# QOE parameters update
